@@ -1,0 +1,221 @@
+{
+  "name": "Umbrella reminder: morning weather email",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "name": "Every morning at 7:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "52a78023-56ca-4ff1-8995-05d493b7f9d9"
+    },
+    {
+      "parameters": {},
+      "name": "Test run",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "24fd5341-82a4-487f-a105-b498ff8113b3"
+    },
+    {
+      "parameters": {
+        "url": "https://api.open-meteo.com/v1/forecast?latitude=59.437&longitude=24.7536&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FTallinn&forecast_days=1",
+        "options": {}
+      },
+      "name": "Get today's weather",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        100
+      ],
+      "id": "c7bf94e7-422c-4423-bd63-2aa0559011a3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3824491e-12e6-4a33-a371-05559a2f6627",
+              "name": "rainChance",
+              "value": "={{ $json.daily.precipitation_probability_max[0] }}",
+              "type": "number"
+            },
+            {
+              "id": "f3f951e5-f398-4fbe-b6b2-cdfa0fd6890a",
+              "name": "tempMin",
+              "value": "={{ $json.daily.temperature_2m_min[0] }}",
+              "type": "number"
+            },
+            {
+              "id": "e5fd1983-bcb9-421f-bf3f-59e565c78ffd",
+              "name": "tempMax",
+              "value": "={{ $json.daily.temperature_2m_max[0] }}",
+              "type": "number"
+            },
+            {
+              "id": "03146bf1-26ee-483a-ba2b-6575fa3201ff",
+              "name": "message",
+              "value": "=Today in Tallinn: {{ $json.daily.temperature_2m_min[0] }}–{{ $json.daily.temperature_2m_max[0] }} °C, chance of rain {{ $json.daily.precipitation_probability_max[0] }} %.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Pick the important numbers",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        100
+      ],
+      "id": "66909870-5cbc-4946-b5bf-a315dbc5c6e2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "83f5228b-6e25-4c78-8bfa-55bfcd7e4b5e",
+              "leftValue": "={{ $json.rainChance }}",
+              "rightValue": 50,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Rain chance 50 % or more?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        100
+      ],
+      "id": "8c0aad06-4ff1-435c-80e7-c5d37253dffc"
+    },
+    {
+      "parameters": {
+        "fromEmail": "weather@your-email.example",
+        "toEmail": "you@your-email.example",
+        "subject": "☔ Take an umbrella today",
+        "emailFormat": "text",
+        "text": "={{ $json.message }} Don't forget your umbrella!",
+        "options": {}
+      },
+      "name": "Email: take an umbrella",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        0
+      ],
+      "id": "4c25cd9f-1667-460e-b0f6-a01fb44fe86a"
+    },
+    {
+      "parameters": {},
+      "name": "No rain, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        960,
+        200
+      ],
+      "id": "2ed43c93-fa0b-4804-9fce-f71eab4b19dc"
+    }
+  ],
+  "connections": {
+    "Every morning at 7:00": {
+      "main": [
+        [
+          {
+            "node": "Get today's weather",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test run": {
+      "main": [
+        [
+          {
+            "node": "Get today's weather",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get today's weather": {
+      "main": [
+        [
+          {
+            "node": "Pick the important numbers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick the important numbers": {
+      "main": [
+        [
+          {
+            "node": "Rain chance 50 % or more?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rain chance 50 % or more?": {
+      "main": [
+        [
+          {
+            "node": "Email: take an umbrella",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No rain, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Tallinn"
+  },
+  "pinData": {}
+}

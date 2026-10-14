@@ -1,0 +1,194 @@
+{
+  "name": "Electricity price alert: email when tomorrow gets expensive",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 15
+            }
+          ]
+        }
+      },
+      "name": "Every day at 15:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4716376a-4df3-4976-a250-70cbd76f1dd8"
+    },
+    {
+      "parameters": {},
+      "name": "Test run",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "c0835d36-23ab-4e77-bc8e-2db83295a28a"
+    },
+    {
+      "parameters": {
+        "url": "={{ \"https://dashboard.elering.ee/api/nps/price?start=\" + $now.setZone(\"Europe/Tallinn\").startOf(\"day\").toUTC().toISO() + \"&end=\" + $now.setZone(\"Europe/Tallinn\").plus({ days: 2 }).startOf(\"day\").toUTC().toISO() }}",
+        "options": {}
+      },
+      "name": "Get electricity prices (Elering)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        100
+      ],
+      "id": "823fac28-c309-4192-9986-01c7f930e3bc"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node: \"Compare today vs tomorrow\"\n// Input: Elering NPS price response ({ data: { ee: [{ timestamp, price }] } }), price in €/MWh, 15-min steps.\nconst RISE_THRESHOLD = 0.20;   // alert when tomorrow's average is 20 % higher than today's\nconst PEAK_LIMIT = 150;        // …or when any hour tomorrow goes above 150 €/MWh\n\nconst points = $input.first().json.data.ee;\nconst tz = 'Europe/Tallinn';\nconst dayKey = (ts) => new Date(ts * 1000).toLocaleDateString('en-CA', { timeZone: tz });\nconst hourOf = (ts) => Number(new Date(ts * 1000).toLocaleString('en-GB', { timeZone: tz, hour: '2-digit', hour12: false }));\n\nconst today = new Date().toLocaleDateString('en-CA', { timeZone: tz });\nconst tomorrowDate = new Date(Date.now() + 86400000).toLocaleDateString('en-CA', { timeZone: tz });\n\nconst byDay = (day) => points.filter((p) => dayKey(p.timestamp) === day);\nconst avg = (arr) => arr.reduce((s, p) => s + p.price, 0) / arr.length;\n\nconst todayPts = byDay(today);\nconst tomorrowPts = byDay(tomorrowDate);\nif (!todayPts.length || !tomorrowPts.length) {\n  return [{ json: { alert: false, reason: 'Tomorrow\\'s prices are not published yet' } }];\n}\n\n// average per hour for tomorrow (15-minute prices → hourly)\nconst hours = {};\nfor (const p of tomorrowPts) (hours[hourOf(p.timestamp)] ??= []).push(p.price);\nconst hourly = Object.entries(hours).map(([h, v]) => ({ hour: Number(h), price: v.reduce((a, b) => a + b, 0) / v.length }));\nconst sorted = [...hourly].sort((a, b) => b.price - a.price);\nconst fmtHour = (h) => `${String(h).padStart(2, '0')}:00`;\nconst cents = (eurMwh) => (eurMwh / 10).toFixed(1); // €/MWh → c/kWh\n\nconst todayAvg = avg(todayPts);\nconst tomorrowAvg = avg(tomorrowPts);\nconst change = (tomorrowAvg - todayAvg) / todayAvg;\nconst peak = sorted[0];\nconst alert = change >= RISE_THRESHOLD || peak.price >= PEAK_LIMIT;\n\nconst expensive = sorted.slice(0, 3).map((h) => `${fmtHour(h.hour)} (${cents(h.price)} c/kWh)`);\nconst cheap = sorted.slice(-3).reverse().map((h) => `${fmtHour(h.hour)} (${cents(h.price)} c/kWh)`);\n\nconst subject = `⚡ Electricity tomorrow: ${change >= 0 ? '+' : ''}${(change * 100).toFixed(0)} %, average ${cents(tomorrowAvg)} c/kWh`;\nconst html = `\n  <h2 style=\"margin:0 0 8px\">Electricity price alert for ${tomorrowDate}</h2>\n  <p>Tomorrow's average price is <b>${cents(tomorrowAvg)} c/kWh</b>. Today it is ${cents(todayAvg)} c/kWh\n  (<b>${change >= 0 ? '+' : ''}${(change * 100).toFixed(0)} %</b>).</p>\n  <p><b>Most expensive hours:</b> ${expensive.join(', ')}<br>\n  <b>Cheapest hours:</b> ${cheap.join(', ')}</p>\n  <p><b>Decision needed:</b> move energy-heavy work (ovens, compressors, charging) out of the expensive hours if possible.</p>\n  <p style=\"color:#888;font-size:12px\">Source: Elering / Nord Pool day-ahead prices, Estonia. Sent automatically by n8n.</p>`;\n\nreturn [{ json: { alert, date: tomorrowDate, todayAvg: +cents(todayAvg), tomorrowAvg: +cents(tomorrowAvg), changePct: +(change * 100).toFixed(1), peakHour: fmtHour(peak.hour), peakPrice: +cents(peak.price), expensive, cheap, subject, html } }];\n"
+      },
+      "name": "Compare today vs tomorrow",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        100
+      ],
+      "id": "b8ec722e-cd37-46fc-8734-5b9361154e3b"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2d2b82c3-99c4-40ff-84a5-2139ed9860ac",
+              "leftValue": "={{ $json.alert }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Price rising?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        100
+      ],
+      "id": "f1d4de01-d907-4c16-9521-3d35fa74c5f1"
+    },
+    {
+      "parameters": {
+        "fromEmail": "alerts@your-company.example",
+        "toEmail": "manager@your-company.example",
+        "subject": "={{ $json.subject }}",
+        "emailFormat": "html",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "name": "Email the manager",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        0
+      ],
+      "id": "4dab3772-2cd0-4bb9-aaa6-22ffb4df9de3"
+    },
+    {
+      "parameters": {},
+      "name": "No significant rise",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        960,
+        200
+      ],
+      "id": "3c191192-237c-4593-a90f-8df6db001e53"
+    }
+  ],
+  "connections": {
+    "Every day at 15:00": {
+      "main": [
+        [
+          {
+            "node": "Get electricity prices (Elering)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test run": {
+      "main": [
+        [
+          {
+            "node": "Get electricity prices (Elering)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get electricity prices (Elering)": {
+      "main": [
+        [
+          {
+            "node": "Compare today vs tomorrow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare today vs tomorrow": {
+      "main": [
+        [
+          {
+            "node": "Price rising?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Price rising?": {
+      "main": [
+        [
+          {
+            "node": "Email the manager",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No significant rise",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Tallinn"
+  },
+  "pinData": {}
+}

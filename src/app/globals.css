@@ -1,26 +1,177 @@
 @import "tailwindcss";
 
+/* ── Design tokens ───────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* "Lavender Pink" palette: blush canvas, deep plum type, raspberry-mauve accent */
+  --bg: #fbf5f8;
+  --bg-raised: #fdf9fb;
+  --surface: #ffffff;
+  --surface-2: #f5e9f0;
+  --line: rgb(58 32 64 / 0.1);
+  --line-strong: rgb(58 32 64 / 0.2);
+  --fg: #3a2040;
+  --fg-muted: #5f4a63;
+  --fg-subtle: #75607a;
+  --accent: #a3477d;
+  --accent-hover: #8a3a69;
+  --accent-ink: #fff7fb;
+  --accent-soft: rgb(163 71 125 / 0.08);
+  --accent-line: rgb(163 71 125 / 0.3);
+  --warn: #8a5300;
+  --info: #3d5fa8;
+
+  /* Palette swatches: #D7AEFB · #F0AEF8 · #EBAED2 · #EEB0AC · #F0D7AE (+ soft mint & sky) */
+  --swatch-lavender: #d7aefb;
+  --swatch-orchid: #f0aef8;
+  --swatch-pink: #ebaed2;
+  --swatch-peach: #eeb0ac;
+  --swatch-butter: #f0d7ae;
+
+  /* Soft two-stop gradients used for project placeholders */
+  --tone-lavender: linear-gradient(180deg, #e9d6fc 0%, #f4def2 100%);
+  --tone-orchid: linear-gradient(180deg, #f7d9fb 0%, #fbe9f3 100%);
+  --tone-pink: linear-gradient(180deg, #f3cfe2 0%, #f9e4ec 100%);
+  --tone-peach: linear-gradient(180deg, #f4cdca 0%, #f8e2d6 100%);
+  --tone-butter: linear-gradient(180deg, #f6e4c8 0%, #f9eee0 100%);
+  --tone-mint: linear-gradient(180deg, #d4ebea 0%, #dfe5f3 100%);
+  --tone-sky: linear-gradient(180deg, #dbe5f6 0%, #eadff0 100%);
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-raised: var(--bg-raised);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-ink: var(--accent-ink);
+  --color-swatch-lavender: var(--swatch-lavender);
+  --color-swatch-orchid: var(--swatch-orchid);
+  --color-swatch-pink: var(--swatch-pink);
+  --color-swatch-peach: var(--swatch-peach);
+  --color-swatch-butter: var(--swatch-butter);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-line: var(--accent-line);
+  --color-warn: var(--warn);
+  --color-info: var(--info);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-bricolage), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Base ────────────────────────────────────────────────────────────────── */
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5.5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Utilities ───────────────────────────────────────────────────────────── */
+@utility container-page {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  @media (min-width: 768px) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-subtle);
+}
+
+@utility text-balance-safe {
+  text-wrap: balance;
+}
+
+/* Soft pastel wash behind the hero (static, no animation) */
+@utility bg-blush {
+  background:
+    radial-gradient(45% 55% at 85% 10%, rgb(215 174 251 / 0.35), transparent 70%),
+    radial-gradient(40% 50% at 10% 0%, rgb(235 174 210 / 0.35), transparent 70%),
+    radial-gradient(35% 45% at 60% 90%, rgb(240 215 174 / 0.3), transparent 70%);
+}
+
+/* ── Gentle fade-in on page load (CSS only, no JS needed) ────────────────── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fade-up {
+  animation: fade-up 0.7s var(--ease-out-expo) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Lightbox (native <dialog>) */
+dialog.lightbox::backdrop {
+  background: rgb(42 22 46 / 0.82);
+  backdrop-filter: blur(4px);
+}
+dialog.lightbox[open] {
+  animation: fade-in 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }
