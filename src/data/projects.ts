@@ -120,6 +120,8 @@ export interface Project {
   layout?: "case-study" | "gallery";
   /** Extra deep-dive sections rendered for this project only. */
   deepDive?: "meal-planner";
+  /** Shown in the Featured projects block at the top of the home page. */
+  featured?: boolean;
   tone: ProjectTone;
   /** Full URL to the source code, e.g. "https://github.com/you/repo". Shown as "Source code". */
   githubUrl?: string;
@@ -136,6 +138,7 @@ export interface Project {
 export const projects: Project[] = [
   {
     slug: "ai-nutrition-meal-planner",
+    featured: true,
     index: "01",
     title: "AI Nutrition & Weekly Meal Planner",
     category: "AI Application / Personalization",
@@ -239,6 +242,7 @@ export const projects: Project[] = [
 
   {
     slug: "ai-website-builder",
+    featured: true,
     index: "02",
     title: "AI-Powered Website Builder",
     category: "AI Integration / Web Development",
@@ -315,6 +319,7 @@ export const projects: Project[] = [
   /* ── Content Factory ────────────────────────────────────────────────── */
   {
     slug: "content-factory",
+    featured: true,
     index: "03",
     title: "Content Factory",
     category: "AI Platform / Full-Stack",

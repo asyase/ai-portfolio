@@ -99,7 +99,13 @@ export const about = {
         "2020 · Secondary Education · Tallinn Õismäe Russian Lyceum · Graduated with a Gold Medal",
       ],
     },
-    { label: "Training", value: "Full-Stack AI Developer Programme · BCS Koolitus (2026), incl. LLMOps" },
+    {
+      label: "Training",
+      value: [
+        "Full-Stack AI Developer Programme · BCS Koolitus (2026) · 280 academic hours, incl. LLMOps",
+        "Also in 2026: AI-Assisted Web Development (Vibe Coding) · From Junior to Senior Software Developer, TalTech",
+      ],
+    },
     { label: "Recognition", value: "Course award and an award from the RingIT company for my AI meal planner, my most comprehensive AI project" },
     { label: "Languages", value: "Estonian C1 · English (FCE) · Russian native" },
   ],
