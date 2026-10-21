@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 import { navLinks, site } from "@/data/site";
 import { cn } from "@/lib/utils";
 
+
 /** Highlights the nav link for the section currently in view (home page only). */
 function useActiveSection(enabled: boolean) {
   const [active, setActive] = useState("");
@@ -86,10 +87,10 @@ export function Nav() {
           <Image
             src="/brand/logo-as.png"
             alt=""
-            width={326}
+            width={325}
             height={243}
             priority
-            className="h-12 w-auto transition-transform duration-300 group-hover:-rotate-2"
+            className="h-14 w-auto transition-transform duration-300 group-hover:-rotate-2"
           />
         </Link>
 

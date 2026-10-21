@@ -11,7 +11,7 @@ export function Footer() {
     <footer className="border-t border-line">
       <div className="container-page flex flex-col gap-8 py-10 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-2">
-          <Image src="/brand/logo-as.png" alt={site.name} width={326} height={243} className="h-24 w-auto" />
+          <Image src="/brand/logo-as.png" alt={site.name} width={325} height={243} className="h-20 w-auto self-start" />
           <p className="text-sm text-fg-subtle">
             © {year} {site.name}. Designed &amp; built with Next.js.
           </p>

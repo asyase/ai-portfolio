@@ -65,6 +65,8 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-display: var(--font-bricolage), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -154,6 +156,22 @@ body {
   to {
     opacity: 1;
   }
+}
+
+/* Image reveal used by the "How I work" stages */
+@keyframes reveal-up {
+  from {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(18px);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+.reveal-up {
+  animation: reveal-up 0.9s var(--ease-out-expo) both;
+  animation-delay: var(--d, 0ms);
 }
 
 /* Lightbox (native <dialog>) */

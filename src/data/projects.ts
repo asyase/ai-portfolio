@@ -118,6 +118,8 @@ export interface Project {
   coverImage?: Screenshot;
   /** "gallery" projects show an image gallery instead of the case-study sections. */
   layout?: "case-study" | "gallery";
+  /** Extra deep-dive sections rendered for this project only. */
+  deepDive?: "meal-planner";
   tone: ProjectTone;
   /** Full URL to the source code, e.g. "https://github.com/you/repo". Shown as "Source code". */
   githubUrl?: string;
@@ -140,8 +142,8 @@ export const projects: Project[] = [
     description:
       "A meal-planning app that builds a weekly menu and recipes from what's already at home, counts calories, and makes a shopping list of only what's missing, with prompt A/B tests, an LLM judge and layered input safety.",
     status: "completed",
-    context: "Personal project · AI Full-Stack Developer course (BCS Koolitus)",
-    recognition: ["Award at the AI Full-Stack Developer course", "Award from RingIT"],
+    context: "Personal project · Full-Stack AI Developer Programme (BCS Koolitus)",
+    recognition: ["Award at the Full-Stack AI Developer Programme", "Award from the RingIT company"],
     year: "2026",
     role: "Personal project, built end to end: idea, Java backend, Vue frontend, prompts, evaluation and security.",
     technologies: [
@@ -218,7 +220,7 @@ export const projects: Project[] = [
       },
     ],
     results: [
-      "Received an award at the AI Full-Stack Developer course and an award from the company RingIT.",
+      "Received an award at the Full-Stack AI Developer Programme and an award from the RingIT company.",
       "Prompt A/B test on a deliberately hard input (eggs, milk, tomato, cheese, gummy bears, Aperol Spritz): the simple prompt (v1) produced an absurd \"recipe\" in 3 of 4 settings, the full prompt (v2: role, grounding, quality rule, one-shot, security rules) in 0 of 4.",
       "HIGH vs LOW thinking: 2,105 vs 558 tokens and 28.6 s vs 2.0 s for the same quality score, so the app uses LOW.",
       "The AI judge gave 93/100 to \"pour Aperol into a glass, add gummy bears\", which is why every AI answer is also checked in Java.",
@@ -232,6 +234,7 @@ export const projects: Project[] = [
     ],
     screenshots: [],
     tone: "butter",
+    deepDive: "meal-planner",
   },
 
   {
@@ -492,10 +495,10 @@ export const projects: Project[] = [
   {
     slug: "ai-data-assistant",
     index: "05",
-    title: "AI Data Assistant",
-    category: "AI / Data / Backend",
+    title: "AI Data Assistant Chatbot",
+    category: "AI Chatbot / Data / Backend",
     description:
-      "Plain-language questions about cargo, vehicles and jobs for a crane and transport company, Gemini writes the SQL, the backend checks it and runs it read-only, and the AI summarises the answer.",
+      "An AI chatbot for a crane and transport company: ask plain-language questions about cargo, vehicles and jobs. Gemini writes the SQL, the backend checks it and runs it read-only, and the AI summarises the answer.",
     status: "prototype",
     context: "Vali-IT group project",
     company: "a crane and transport company",
@@ -508,13 +511,14 @@ export const projects: Project[] = [
       { name: "Vue 3 & Vite", usedFor: "The company's web app the chat belongs to" },
     ],
     highlights: [
+      "AI chatbot for fleet and job data",
       "Natural-language questions about the fleet",
       "SELECT-only, read-only execution",
       "Forbidden and unanswerable questions handled",
       "SQL shown next to every answer",
     ],
     overview:
-      "An AI assistant inside a crane and transport company's web app. An admin can ask things like \"Which vehicles can lift 4 tonnes at a 10 m reach?\" or \"What is the heaviest cargo?\" and get a short answer, plus the SQL query it was based on. The cover is an illustrative mockup of the planned chat screen, with answers taken from the project's own sample data.",
+      "An AI chatbot inside a crane and transport company's web app. An admin can ask things like \"Which vehicles can lift 4 tonnes at a 10 m reach?\" or \"What is the heaviest cargo?\" and get a short answer, plus the SQL query it was based on. The cover is an illustrative mockup of the planned chat screen, with answers taken from the project's own sample data.",
     problem:
       "Fleet and job data lives in a relational database, but the people with questions (which crane can do a lift, what's planned, which truck is in for maintenance) don't write SQL. Letting a model write queries is tempting, but generated SQL can be wrong or unsafe if it's run blindly.",
     solution:
@@ -567,9 +571,75 @@ export const projects: Project[] = [
     tone: "pink",
   },
 
+  /* ── Training platform (internship, in progress) ─────────────────────── */
+  {
+    slug: "ai-assisted-training-platform",
+    index: "06",
+    title: "AI-Assisted Training Platform",
+    category: "Full-Stack / Team Project",
+    description:
+      "A web-based training management platform for BCS Koolitus, built by a Scrum team in an AI-assisted development internship: a Java and Spring Boot backend, a Vue 3 frontend, and planned Spring AI features for turning curriculum PDFs into structured content.",
+    status: "in-development",
+    statusNote: "Internship · in progress",
+    year: "2026",
+    context: "Team development project · internship",
+    company: "BCS Koolitus",
+    role: "Team member in a Scrum team: requirements analysis, database modelling, user-role definition and UI planning based on the client's specifications, with Claude Code supporting technical planning, implementation and code review.",
+    technologies: [
+      { name: "Java & Spring Boot", usedFor: "Backend and REST API" },
+      { name: "Spring Security & JWT", usedFor: "Authentication and user roles" },
+      { name: "PostgreSQL & Flyway", usedFor: "Database and versioned migrations" },
+      { name: "Vue 3, TypeScript, Pinia & Tailwind CSS", usedFor: "Frontend" },
+      { name: "Spring AI", usedFor: "Planned: curriculum PDFs into structured content, and translating training materials" },
+      { name: "Claude Code", usedFor: "AI-assisted technical planning, implementation and code review" },
+      { name: "Git & Docker", usedFor: "Version control and local environment" },
+      { name: "Jira & Confluence", usedFor: "Sprint planning and specifications" },
+    ],
+    highlights: [
+      "Specification-driven work in a Scrum team",
+      "Requirements, database model and user roles from a client brief",
+      "Claude Code in planning, implementation and code review",
+      "Planned: Spring AI for curriculum PDFs and translation",
+    ],
+    overview:
+      "A training management platform built for BCS Koolitus as a team internship project. The team works in sprints from the client's specifications and uses AI development tools as part of the process. The project is in progress, so there are no screenshots or results yet.",
+    problem:
+      "Training curricula often exist only as PDF documents, and training materials are needed in more than one language. The platform is meant to manage trainings in one place, and the planned AI features target exactly those two manual steps.",
+    solution:
+      "A full-stack web application with role-based access, built specification-first: requirements, user roles and the database model come before code, sprints are planned in Jira and documented in Confluence, and Claude Code supports planning, implementation and review. AI features are planned with Spring AI on top of the same backend.",
+    howItWorks: [
+      { title: "Specify", description: "Requirements and user roles are analysed from the client's specifications and written down in Confluence." },
+      { title: "Model", description: "The database is modelled first and evolved through Flyway migrations." },
+      { title: "Build in sprints", description: "Work is planned in Jira sprints and built as a Spring Boot API with a Vue 3 frontend." },
+      { title: "Review", description: "Claude Code helps with technical planning, implementation and code review, alongside the team's own reviews." },
+    ],
+    workflow: [
+      { label: "Client specification", detail: "Requirements · roles", kind: "input" },
+      { label: "Vue 3 frontend", detail: "TypeScript · Pinia · Tailwind", kind: "process" },
+      { label: "Spring Boot API", detail: "Spring Security · JWT", kind: "process" },
+      { label: "PostgreSQL", detail: "Flyway migrations", kind: "storage" },
+      { label: "Spring AI (planned)", detail: "PDF → structured content", kind: "ai" },
+      { label: "Training platform", detail: "Web app", kind: "output" },
+    ],
+    features: [
+      { label: "Curriculum PDFs converted into structured content with Spring AI", status: "planned" },
+      { label: "Translation of training materials with Spring AI", status: "planned" },
+    ],
+    implementationDetails: [
+      "Development scope: Java, Spring Boot, PostgreSQL, Flyway, Spring Security, JWT, Vue 3, TypeScript, Pinia and Tailwind CSS.",
+      "Scrum with Jira, Confluence, sprint planning and specification-driven development.",
+      "AI development tools, including Claude Code, used for technical planning, implementation and code review.",
+    ],
+    challenges: [],
+    results: [],
+    lessons: [],
+    screenshots: [],
+    tone: "sky",
+  },
+
   {
     slug: "product-aggregation-platform",
-    index: "06",
+    index: "07",
     title: "Clothing Search & Product Aggregation",
     category: "Full-Stack / Data / Scraping",
     description:
@@ -647,7 +717,7 @@ export const projects: Project[] = [
 
   {
     slug: "telegram-life-assistant",
-    index: "07",
+    index: "08",
     title: "Telegram Life Assistant",
     category: "Automation / Integrations",
     description:
@@ -726,7 +796,7 @@ export const projects: Project[] = [
 
   {
     slug: "n8n-workflow-automations",
-    index: "08",
+    index: "09",
     title: "n8n Workflow Automations",
     category: "Workflow Automation",
     description:
@@ -867,7 +937,7 @@ export const projects: Project[] = [
   },
   {
     slug: "ai-creative-design",
-    index: "09",
+    index: "10",
     title: "AI Creative Design & Visuals",
     category: "Generative AI / Creative Design",
     description:

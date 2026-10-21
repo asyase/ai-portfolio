@@ -1,4 +1,5 @@
 import { about } from "@/data/site";
+import { LinkedText } from "@/components/ui/LinkedText";
 
 export function About() {
   return (
@@ -17,7 +18,19 @@ export function About() {
             {about.facts.map((fact) => (
               <div key={fact.label} className="grid grid-cols-[6.5rem_1fr] gap-4 py-4">
                 <dt className="text-sm text-fg-subtle">{fact.label}</dt>
-                <dd className="text-[15px] font-medium text-fg">{fact.value}</dd>
+                <dd className="text-[15px] font-medium text-fg">
+                  {typeof fact.value === "string" ? (
+                    <LinkedText text={fact.value} />
+                  ) : (
+                    <ul className="space-y-2">
+                      {fact.value.map((v) => (
+                        <li key={v}>
+                          <LinkedText text={v} />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </dd>
               </div>
             ))}
           </dl>

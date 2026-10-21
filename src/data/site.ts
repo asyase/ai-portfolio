@@ -52,8 +52,14 @@ export const site = {
   },
 } as const;
 
+/** Names that are always shown as links wherever they appear in the text. */
+export const termLinks: Record<string, string> = {
+  RingIT: "https://www.ringit.ee/et/",
+};
+
 export const navLinks = [
   { label: "About", href: "/#about", id: "about" },
+  { label: "How I work", href: "/#how-i-work", id: "how-i-work" },
   { label: "Projects", href: "/#projects", id: "projects" },
   { label: "Skills", href: "/#skills", id: "skills" },
   { label: "Contact", href: "/#contact", id: "contact" },
@@ -71,17 +77,30 @@ export const about = {
   title: "A developer first, now building with AI.",
   paragraphs: [
     `I studied Computer Science at ${education.school} (Institute of Digital Technologies), where I built my foundation in software development: writing code, designing systems and approaching problems in a structured way. A UX/UI background helps me look at what I build from the user's side too.`,
-    "Since 2024 I've worked as a developer on real products: e-commerce websites, and later full-stack work on a business platform: JavaScript and Go Templates on the frontend, SQL and REST APIs behind it, and integrations such as e-invoicing flows with XML parsing.",
-    "That's also where AI became part of my day job: I integrated the Anthropic Claude API into the company's commercial website builder and built the prompt input and the preview for the generated content. In 2026 I completed the AI Full-Stack Developer programme at BCS Koolitus, and now I understand these processes even more deeply: from structured prompting and grounding to building, testing and running AI features inside full-stack applications, including LLMOps.",
+    "From 2021 to 2024 I worked at Telia Eesti AS as Customer Service & Mentor, and in 2022 I did a Web Master internship there. Since 2024 I've worked as a developer at Erply on real products: e-commerce websites, and later full-stack work on a business platform: JavaScript and Go Templates on the frontend, SQL and REST APIs behind it, and integrations such as e-invoicing flows with XML parsing.",
+    "That's also where AI became part of my day job: I integrated the Anthropic Claude API into the company's commercial website builder and built the prompt input and the preview for the generated content. In 2026 I completed the Full-Stack AI Developer Programme at BCS Koolitus, and now I understand these processes even more deeply: from structured prompting and grounding to building, testing and running AI features inside full-stack applications, including LLMOps.",
     "Today I work with Claude, ChatGPT, Gemini, n8n, Cursor, Claude Code and OpenAI Codex alongside my development stack. For me, AI is an extension of software development, not a replacement for it.",
     "I enjoy learning new technologies, solving technical problems and turning ideas into working applications.",
   ],
   /** Short facts shown next to the text. */
   facts: [
-    { label: "Education", value: `${education.degree}, ${education.school} (2023)` },
-    { label: "Experience", value: "Developer, 2024–2026: business platform and e-commerce sites; web internship in 2022" },
-    { label: "Training", value: "AI Full-Stack Developer programme, BCS Koolitus (2026), incl. LLMOps" },
-    { label: "Recognition", value: "Course award and an award from the company RingIT for my AI meal planner, my most comprehensive AI project" },
+    {
+      label: "Experience",
+      value: [
+        "Erply Development OÜ · 2024–2026 · GoERP business platform & e-commerce",
+        "Customer Service & Mentor · Telia Eesti AS · 2021–2024",
+        "Web Master Internship · Telia Eesti AS · 2022",
+      ],
+    },
+    {
+      label: "Education",
+      value: [
+        `2023 · ${education.degree} · ${education.school}`,
+        "2020 · Secondary Education · Tallinn Õismäe Russian Lyceum · Graduated with a Gold Medal",
+      ],
+    },
+    { label: "Training", value: "Full-Stack AI Developer Programme · BCS Koolitus (2026), incl. LLMOps" },
+    { label: "Recognition", value: "Course award and an award from the RingIT company for my AI meal planner, my most comprehensive AI project" },
     { label: "Languages", value: "Estonian C1 · English (FCE) · Russian native" },
   ],
 } as const;

@@ -4,6 +4,7 @@ import type { Project } from "@/data/projects";
 import { hasContent } from "@/lib/content";
 import { Badge, StatusPill } from "@/components/ui/primitives";
 import { ProjectCover } from "./ProjectCover";
+import { LinkedText } from "@/components/ui/LinkedText";
 
 export function ProjectCard({ project }: { project: Project }) {
   const technologies = project.technologies
@@ -32,9 +33,11 @@ export function ProjectCard({ project }: { project: Project }) {
         </Link>
       </h3>
       {project.recognition && project.recognition.length > 0 && (
-        <p className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-[#fbeedd] px-3 py-1.5 text-[13px] font-medium text-[#8a5300]">
-          <Award className="size-4" aria-hidden="true" />
-          {project.recognition.join(" · ")}
+        <p className="relative z-[3] mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-[#fbeedd] px-3 py-1.5 text-[13px] font-medium text-[#8a5300]">
+          <Award className="size-4 shrink-0" aria-hidden="true" />
+          <span>
+            <LinkedText text={project.recognition.join(" · ")} className="underline decoration-1 underline-offset-2 hover:text-fg" />
+          </span>
         </p>
       )}
       <p className="mt-3 text-[15px] leading-relaxed text-fg-muted">{project.description}</p>

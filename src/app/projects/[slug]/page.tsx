@@ -16,9 +16,12 @@ import { hasContent, isTodo } from "@/lib/content";
 import { GithubIcon } from "@/components/ui/BrandIcons";
 import { Badge, ButtonLink, FeatureStatusBadge, PlaceholderNote, StatusPill, Text } from "@/components/ui/primitives";
 import { ProjectCover } from "@/components/projects/ProjectCover";
+import { LinkedText } from "@/components/ui/LinkedText";
 import { Gallery } from "@/components/gallery/Gallery";
 import { CaseStudyToc } from "@/components/case-study/CaseStudyToc";
 import { FlowDiagram } from "@/components/case-study/FlowDiagram";
+import { BehindTheIntelligence } from "@/components/case-study/meal-planner/BehindTheIntelligence";
+import { TestingTheIntelligence } from "@/components/case-study/meal-planner/TestingTheIntelligence";
 import { ReadingProgress } from "@/components/case-study/ReadingProgress";
 import { Screenshots, getScreenshots } from "@/components/case-study/Screenshots";
 
@@ -90,7 +93,9 @@ function BulletList({ items }: { items: string[] }) {
         ) : (
           <li key={i} className="flex gap-4 text-[17px] leading-relaxed text-fg-muted">
             <span className="mt-[0.7em] h-px w-4 shrink-0 bg-accent" aria-hidden="true" />
-            {item}
+            <span>
+              <LinkedText text={item} />
+            </span>
           </li>
         ),
       )}
@@ -212,6 +217,7 @@ export default async function CaseStudyPage(props: PageProps<"/projects/[slug]">
     results: hasAny(project.results) || hasAny(project.lessons) || notes,
   };
 
+  const deepDive = project.deepDive === "meal-planner";
   const sections = [
     { id: "overview", label: "Overview", on: show.overview },
     { id: "problem", label: "The problem", on: show.problem },
@@ -219,7 +225,8 @@ export default async function CaseStudyPage(props: PageProps<"/projects/[slug]">
     { id: "approach", label: "The approach", on: show.approach },
     { id: "technologies", label: "Technologies", on: show.technologies },
     { id: "how-it-works", label: "How it works", on: show.how },
-    { id: "architecture", label: "Architecture", on: show.architecture },
+    { id: "architecture", label: deepDive ? "Behind the intelligence" : "Architecture", on: show.architecture },
+    { id: "testing", label: "Testing the intelligence", on: deepDive },
     { id: "screenshots", label: "Screenshots & demo", on: show.screenshots },
     { id: "challenges", label: "Challenges & solutions", on: show.challenges },
     { id: "results", label: "Results & lessons", on: show.results },
@@ -241,7 +248,9 @@ export default async function CaseStudyPage(props: PageProps<"/projects/[slug]">
                 {project.recognition.map((r) => (
                   <li key={r} className="flex items-start gap-2">
                     <Award className="mt-0.5 size-4 shrink-0 text-[#8a5300]" aria-hidden="true" />
-                    {r}
+                    <span>
+                      <LinkedText text={r} />
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -252,6 +261,67 @@ export default async function CaseStudyPage(props: PageProps<"/projects/[slug]">
   ];
 
   const technologies = project.technologies.filter((t) => hasContent(t.name) || (notes && isTodo(t.name)));
+
+  const rest = (
+    <>
+          {show.screenshots && (
+            <Section id="screenshots" number={num("screenshots")} title="Screenshots & demo">
+              {getScreenshots(project).length > 0 ? (
+                <Screenshots project={project} />
+              ) : (
+                <PlaceholderNote>Add screenshots to /public/projects/{project.slug}/. They appear here automatically.</PlaceholderNote>
+              )}
+              {project.demoUrl && (
+                <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 text-sm text-fg hover:text-accent">
+                  Open the live demo <ArrowUpRight className="size-4" aria-hidden="true" />
+                </a>
+              )}
+            </Section>
+          )}
+
+          {show.challenges && (
+            <Section id="challenges" number={num("challenges")} title="Challenges & solutions">
+              {project.challenges.length > 0 ? (
+                <ul className="space-y-4">
+                  {project.challenges.map((c) => (
+                    <li key={c.challenge} className="grid overflow-hidden rounded-2xl border border-line md:grid-cols-2">
+                      <div className="border-b border-line bg-bg-raised p-6 md:border-b-0 md:border-r">
+                        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle">Challenge</p>
+                        <p className="mt-3 text-[15px] leading-relaxed text-fg">{c.challenge}</p>
+                      </div>
+                      <div className="p-6">
+                        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-accent">Solution</p>
+                        <Text value={c.solution} className="mt-3 text-[15px] leading-relaxed text-fg-muted" />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <PlaceholderNote>Document challenges as the work progresses.</PlaceholderNote>
+              )}
+            </Section>
+          )}
+
+          {show.results && (
+            <Section id="results" number={num("results")} title="Results & lessons learned">
+              <div className="grid gap-10 md:grid-cols-2">
+                <div>
+                  <h3 className="eyebrow">Results</h3>
+                  <div className="mt-5">
+                    {project.results.length > 0 ? <BulletList items={project.results} /> : <PlaceholderNote>Add verifiable results when available.</PlaceholderNote>}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="eyebrow">Lessons learned</h3>
+                  <div className="mt-5">
+                    {project.lessons.length > 0 ? <BulletList items={project.lessons} /> : <PlaceholderNote>Add lessons learned.</PlaceholderNote>}
+                  </div>
+                </div>
+              </div>
+            </Section>
+          )}
+    </>
+  );
 
   return (
     <article className="fade-up">
@@ -402,71 +472,25 @@ export default async function CaseStudyPage(props: PageProps<"/projects/[slug]">
             </Section>
           )}
 
-          {show.architecture && (
+          {show.architecture && !deepDive && (
             <Section id="architecture" number={num("architecture")} title="Architecture & workflow">
               <FlowDiagram nodes={project.workflow} title={project.title} />
             </Section>
           )}
 
-          {show.screenshots && (
-            <Section id="screenshots" number={num("screenshots")} title="Screenshots & demo">
-              {getScreenshots(project).length > 0 ? (
-                <Screenshots project={project} />
-              ) : (
-                <PlaceholderNote>Add screenshots to /public/projects/{project.slug}/. They appear here automatically.</PlaceholderNote>
-              )}
-              {project.demoUrl && (
-                <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 text-sm text-fg hover:text-accent">
-                  Open the live demo <ArrowUpRight className="size-4" aria-hidden="true" />
-                </a>
-              )}
-            </Section>
-          )}
-
-          {show.challenges && (
-            <Section id="challenges" number={num("challenges")} title="Challenges & solutions">
-              {project.challenges.length > 0 ? (
-                <ul className="space-y-4">
-                  {project.challenges.map((c) => (
-                    <li key={c.challenge} className="grid overflow-hidden rounded-2xl border border-line md:grid-cols-2">
-                      <div className="border-b border-line bg-bg-raised p-6 md:border-b-0 md:border-r">
-                        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle">Challenge</p>
-                        <p className="mt-3 text-[15px] leading-relaxed text-fg">{c.challenge}</p>
-                      </div>
-                      <div className="p-6">
-                        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-accent">Solution</p>
-                        <Text value={c.solution} className="mt-3 text-[15px] leading-relaxed text-fg-muted" />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <PlaceholderNote>Document challenges as the work progresses.</PlaceholderNote>
-              )}
-            </Section>
-          )}
-
-          {show.results && (
-            <Section id="results" number={num("results")} title="Results & lessons learned">
-              <div className="grid gap-10 md:grid-cols-2">
-                <div>
-                  <h3 className="eyebrow">Results</h3>
-                  <div className="mt-5">
-                    {project.results.length > 0 ? <BulletList items={project.results} /> : <PlaceholderNote>Add verifiable results when available.</PlaceholderNote>}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="eyebrow">Lessons learned</h3>
-                  <div className="mt-5">
-                    {project.lessons.length > 0 ? <BulletList items={project.lessons} /> : <PlaceholderNote>Add lessons learned.</PlaceholderNote>}
-                  </div>
-                </div>
-              </div>
-            </Section>
-          )}
+          {!deepDive && rest}
         </div>
       </div>
+      )}
 
+      {!isGallery && deepDive && (
+        <>
+          <BehindTheIntelligence number={num("architecture")} />
+          <TestingTheIntelligence number={num("testing")} />
+          <div className="container-page grid gap-10 border-t border-line pb-20 pt-6 md:pb-28 lg:grid-cols-12">
+            <div className="min-w-0 lg:col-span-9 lg:col-start-4 xl:col-span-8 xl:col-start-5">{rest}</div>
+          </div>
+        </>
       )}
 
       {/* ── Prev / next ── */}
