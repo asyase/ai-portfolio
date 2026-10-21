@@ -15,12 +15,12 @@ export function ProjectCard({ project }: { project: Project }) {
     <article className="group relative flex flex-col">
       <ProjectCover project={project} />
 
-      <div className="mt-5 flex items-start justify-between gap-4">
+      <div className="mt-5 flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
         <p className="text-sm text-fg-subtle">
           {project.category}
           {project.company && <span className="block text-fg-muted">For {project.company}</span>}
         </p>
-        <StatusPill status={project.status} className="text-[10px]" />
+        <StatusPill status={project.status} className="shrink-0 whitespace-nowrap text-[10px]" />
       </div>
 
       <h3 className="mt-2 font-display text-2xl font-bold tracking-[-0.025em] text-fg md:text-[1.75rem]">

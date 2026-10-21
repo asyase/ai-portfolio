@@ -63,7 +63,7 @@ export function Contact() {
             <p className="eyebrow">Email</p>
             <a
               href={`mailto:${email}`}
-              className="group mt-3 inline-flex max-w-full items-center gap-3 break-all font-display text-2xl font-bold tracking-[-0.02em] text-fg transition-colors hover:text-accent sm:text-3xl"
+              className="group mt-3 inline-flex max-w-full items-center gap-3 font-display text-[clamp(1rem,5.2vw,1.5rem)] font-bold [overflow-wrap:anywhere] tracking-[-0.02em] text-fg transition-colors hover:text-accent sm:text-3xl"
             >
               <Mail className="size-6 shrink-0 text-fg-subtle transition-colors group-hover:text-accent" aria-hidden="true" />
               {email}

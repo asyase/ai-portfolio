@@ -57,7 +57,7 @@ export function Gallery() {
               )}
             >
               {c.label}
-              <span className={cn("ml-1.5 text-xs", active ? "text-accent-ink/70" : "text-fg-subtle")}>{count}</span>
+              <span className={cn("ml-1.5 text-xs", active ? "text-accent-ink" : "text-fg-subtle")}>{count}</span>
             </button>
           );
         })}

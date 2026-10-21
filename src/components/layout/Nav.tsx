@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -76,13 +77,20 @@ export function Nav() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300",
-        scrolled || open ? "border-line bg-bg/90 backdrop-blur-md" : "border-transparent",
+        // no backdrop-filter while the menu is open: it would become the containing block of the fixed panel and collapse it
+        open ? "border-line bg-bg" : scrolled ? "border-line bg-bg/90 backdrop-blur-md" : "border-transparent",
       )}
     >
       <nav aria-label="Main" className="container-page flex h-16 items-center justify-between gap-6">
-        <Link href="/" className="font-display text-lg font-bold tracking-tight text-fg" aria-label={`${site.name}, home`}>
-          {site.name}
-          <span className="text-accent">.</span>
+        <Link href="/" className="group flex items-center" aria-label={`${site.name}, home`}>
+          <Image
+            src="/brand/logo-as.png"
+            alt=""
+            width={326}
+            height={243}
+            priority
+            className="h-12 w-auto transition-transform duration-300 group-hover:-rotate-2"
+          />
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex">

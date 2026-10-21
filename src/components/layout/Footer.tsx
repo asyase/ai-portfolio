@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { navLinks, site } from "@/data/site";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/BrandIcons";
@@ -10,10 +11,7 @@ export function Footer() {
     <footer className="border-t border-line">
       <div className="container-page flex flex-col gap-8 py-10 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-2">
-          <p className="font-display text-lg font-bold tracking-tight text-fg">
-            {site.name}
-            <span className="text-accent">.</span>
-          </p>
+          <Image src="/brand/logo-as.png" alt={site.name} width={326} height={243} className="h-24 w-auto" />
           <p className="text-sm text-fg-subtle">
             © {year} {site.name}. Designed &amp; built with Next.js.
           </p>

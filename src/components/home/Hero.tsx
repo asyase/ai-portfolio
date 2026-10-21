@@ -11,7 +11,7 @@ export function Hero() {
       <div className="container-page relative">
         <div className="max-w-4xl">
           {site.availability && (
-            <p className="fade-up inline-flex items-center gap-2 text-sm text-fg-muted" style={d(0)}>
+            <p className="fade-up flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-fg-muted" style={d(0)}>
               <span className="size-2 rounded-full bg-accent" aria-hidden="true" />
               {site.availability}
               {site.location && <span className="text-fg-subtle">· {site.location}</span>}
