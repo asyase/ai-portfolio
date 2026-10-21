@@ -120,8 +120,6 @@ export interface Project {
   layout?: "case-study" | "gallery";
   /** Extra deep-dive sections rendered for this project only. */
   deepDive?: "meal-planner";
-  /** Shown in the Featured projects block at the top of the home page. */
-  featured?: boolean;
   tone: ProjectTone;
   /** Full URL to the source code, e.g. "https://github.com/you/repo". Shown as "Source code". */
   githubUrl?: string;
@@ -138,7 +136,6 @@ export interface Project {
 export const projects: Project[] = [
   {
     slug: "ai-nutrition-meal-planner",
-    featured: true,
     index: "01",
     title: "AI Nutrition & Weekly Meal Planner",
     category: "AI Application / Personalization",
@@ -242,7 +239,6 @@ export const projects: Project[] = [
 
   {
     slug: "ai-website-builder",
-    featured: true,
     index: "02",
     title: "AI-Powered Website Builder",
     category: "AI Integration / Web Development",
@@ -319,7 +315,6 @@ export const projects: Project[] = [
   /* ── Content Factory ────────────────────────────────────────────────── */
   {
     slug: "content-factory",
-    featured: true,
     index: "03",
     title: "Content Factory",
     category: "AI Platform / Full-Stack",
@@ -607,7 +602,7 @@ export const projects: Project[] = [
       "Planned: Spring AI for curriculum PDFs and translation",
     ],
     overview:
-      "A training management platform built for BCS Koolitus as a team internship project. The team works in sprints from the client's specifications and uses AI development tools as part of the process. The project is in progress, so there are no screenshots or results yet.",
+      "A training management platform built for BCS Koolitus as a team internship project. The team works in sprints from the client's specifications and uses AI development tools as part of the process. The project is in progress: the image is a wireframe mockup of the planned \"new training\" form, based on the team's prototype, not a screenshot of the finished app, and there are no results yet.",
     problem:
       "Training curricula often exist only as PDF documents, and training materials are needed in more than one language. The platform is meant to manage trainings in one place, and the planned AI features target exactly those two manual steps.",
     solution:

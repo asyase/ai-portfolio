@@ -3,7 +3,7 @@ import { About } from "@/components/home/About";
 import { HowIWork } from "@/components/home/HowIWork";
 import { Skills } from "@/components/home/Skills";
 import { Contact } from "@/components/home/Contact";
-import { FeaturedProjects, ProjectsSection } from "@/components/projects/ProjectsSection";
+import { ProjectsSection } from "@/components/projects/ProjectsSection";
 import { education, site } from "@/data/site";
 
 export default function HomePage() {
@@ -25,9 +25,8 @@ export default function HomePage() {
       />
       <Hero />
       <About />
-      <FeaturedProjects />
-      <HowIWork />
       <ProjectsSection />
+      <HowIWork />
       <Skills />
       <Contact />
     </>
