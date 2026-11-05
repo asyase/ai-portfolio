@@ -238,8 +238,110 @@ export const projects: Project[] = [
   },
 
   {
-    slug: "ai-website-builder",
+    slug: "developer-knowledge-assistant",
     index: "02",
+    title: "Developer Knowledge Assistant",
+    category: "AI / RAG",
+    description:
+      "A RAG assistant that answers questions only from your own documents (Markdown, text and PDF) and cites the exact source of every claim. It says so when the documents don't contain the answer, flags sources that contradict each other, and ships with an evaluation harness that measures retrieval and answer quality.",
+    status: "completed",
+    statusNote: "Runs locally · not publicly deployed",
+    context: "Personal project",
+    year: "2026",
+    role: "Built it alone: architecture, RAG pipeline, frontend, security, tests and the evaluation harness.",
+    technologies: [
+      { name: "Next.js 16 & React 19", usedFor: "App Router frontend and the API route handlers (upload, search, chat)" },
+      { name: "TypeScript", usedFor: "The whole codebase, strict mode" },
+      { name: "LangChain.js", usedFor: "Text splitting, a custom retriever and vector store, prompt templates and structured output" },
+      { name: "Supabase (Postgres + pgvector)", usedFor: "Vector search, Auth, Storage and row-level security, so each user only ever searches their own documents" },
+      { name: "Gemini API", usedFor: "gemini-embedding-2 embeddings (1024 dimensions) and gemini-3.5-flash-lite for answers, on the free tier" },
+      { name: "Claude API", usedFor: "Alternative answer model behind the same interface" },
+      { name: "Vitest & axe-core", usedFor: "396 unit and integration tests, plus accessibility checks" },
+      { name: "GitHub Actions", usedFor: "CI: type checks, linting, tests, build, an offline evaluation run, npm audit and a secret scan" },
+      { name: "Tailwind CSS", usedFor: "Styling, light and dark theme" },
+    ],
+    highlights: [
+      "Every claim cited; invalid citations removed on the server",
+      "Says \"not in your documents\" instead of guessing",
+      "Evaluated on 7 subject areas in English, Russian and Estonian",
+      "Answers in the question's language, whatever the source language",
+    ],
+    overview:
+      "Upload your documents and ask questions about them. The assistant searches your own files, answers only from what it finds, and marks every statement with a source you can open to see the exact excerpt, page or lines. It was first built for engineering documentation and then tested on very different material: travel itineraries, course rules, an employee handbook, invoices, a service agreement and nutrition notes. The screenshots show the app with synthetic test documents; the answers in them are recorded sample answers used for UI testing.",
+    problem:
+      "Ask a general chatbot about your own documents and it will often answer confidently from its general knowledge, with no way to check where a statement came from. For internal documentation, policies or contracts, an answer you can't verify is worse than no answer.",
+    solution:
+      "A retrieval-augmented generation (RAG) pipeline that keeps the model on a short leash: it only sees the excerpts retrieved from your documents, must cite them, and must report missing information and contradictions explicitly. The server then checks the citations against what was actually retrieved and drops any that don't match, so the interface never shows a source the answer didn't come from.",
+    howItWorks: [
+      { title: "Upload and index", description: "Markdown, text and PDF files are parsed, split into overlapping chunks that keep their section, page and line numbers, embedded with Gemini and stored in pgvector." },
+      { title: "Retrieve", description: "A question is embedded and matched against the latest version of each document, in the same embedding space only. The top excerpts are labelled S1, S2… and packed into a size-limited context." },
+      { title: "Answer with structure", description: "The model returns structured output: the answer with citations, whether the context was sufficient, what is missing and which sources disagree." },
+      { title: "Validate", description: "The server keeps only citations that point at retrieved excerpts and marks an answer without valid citations as \"not enough information\"." },
+    ],
+    workflow: [
+      { label: "Upload MD / TXT / PDF", detail: "Size, page and time limits", kind: "input" },
+      { label: "Parse & split", detail: "LangChain · section, page, lines", kind: "process" },
+      { label: "Embed", detail: "gemini-embedding-2 · 1024-d", kind: "ai" },
+      { label: "pgvector", detail: "Row-level security per user", kind: "storage" },
+      { label: "Answer", detail: "Structured output · citations", kind: "ai" },
+      { label: "Citation check", detail: "Server-side validation", kind: "output" },
+    ],
+    features: [
+      { label: "Upload with versioning: re-uploading a file replaces the searchable version", status: "implemented" },
+      { label: "Answers with clickable citations that open the exact excerpt, page or lines", status: "implemented" },
+      { label: "\"Not enough information\" instead of a guess, with what is missing", status: "implemented" },
+      { label: "Contradicting sources shown side by side", status: "implemented" },
+      { label: "Retrieval Inspector: ranked chunks, similarity scores and timings for any question", status: "implemented" },
+      { label: "Dashboard with index statistics and an embedding-model mismatch warning", status: "implemented" },
+      { label: "Rate limits, file limits and prompt-injection handling", status: "implemented" },
+      { label: "Multi-turn conversations (each question is answered on its own, and the UI says so)", status: "planned" },
+      { label: "DOCX, spreadsheets and scanned PDFs (rejected with a clear error today)", status: "planned" },
+    ],
+    implementationDetails: [
+      "Ingestion keeps provenance: each chunk stores its file, section path, page number and line range, which is what the citations point at.",
+      "Retrieval only matches the latest indexed version of each document, and only chunks embedded with the active model, so switching models can't mix incompatible vectors.",
+      "The answer prompt is domain-neutral and wraps documents and the question in separate tags; text inside documents is treated as data, so an instruction hidden in a file is reported, not followed.",
+      "The answer language is detected on the server and named explicitly in the prompt, after tests showed a small model drifting into the language of the documents.",
+      "An evaluation harness runs golden questions in an offline mode (lexical embeddings, used in CI) or against the real APIs with a budget cap, and reports hit@k, MRR, citation validity, status accuracy and results per subject area and language.",
+      "Accessibility checked with axe-core on every page in both themes; the layout works from 320 px wide.",
+    ],
+    challenges: [
+      {
+        challenge: "Does a RAG app built for engineering docs work for any subject, or only for IT?",
+        solution: "I wrote synthetic documents in 7 subject areas (IT, travel, education, business, finance, legal, nutrition) in English, Russian and Estonian, plus 38 golden questions, and ran them against the real models. Retrieval found the right source in the top 3 for every question; the issues were all on the generation side.",
+      },
+      {
+        challenge: "The model sometimes answered a Russian question in Estonian because the documents were Estonian.",
+        solution: "A stricter prompt rule fixed most cases; detecting the question's language on the server and naming it in the prompt fixed the rest (7 of 7 in the re-run).",
+      },
+      {
+        challenge: "Different rules for different things (two contracts, two products) were reported as a \"contradiction\".",
+        solution: "The prompt now separates a real conflict (two values for the same fact) from rules that apply to different things. The real conflict in the test set is still detected.",
+      },
+      {
+        challenge: "An answer that only said \"a document contains an instruction I won't follow\" was counted as answered.",
+        solution: "The server recognises such refusal-only answers and reports them as \"not enough information\", with tests over every saved real answer.",
+      },
+      {
+        challenge: "Could a similarity threshold filter out irrelevant chunks?",
+        solution: "Measured it: an irrelevant chunk scored 0.718 while a relevant one scored 0.658, so a threshold would cut good results. The threshold stays off, and the score is shown as a ranking signal, not a confidence.",
+      },
+    ],
+    results: [
+      "Multi-domain evaluation with real models: the right source in the top 3 for 100% of questions, MRR 0.96, 34 of 35 answers with the correct status, 0 invalid citations and no citations from an unrelated subject.",
+      "396 automated tests, 0 axe accessibility violations, and a CI pipeline that also runs the offline evaluation.",
+      "All real evaluation runs fit in the Gemini free tier ($0).",
+    ],
+    lessons: [
+      "Retrieval was the easy part; most of the work was making the generated answer honest: in the right language, citing only what it used, and saying when it doesn't know.",
+      "Measure before tuning: the evaluation showed that a similarity threshold would have made results worse.",
+    ],
+    screenshots: [],
+    tone: "sky",
+  },
+  {
+    slug: "ai-website-builder",
+    index: "03",
     title: "AI-Powered Website Builder",
     category: "AI Integration / Web Development",
     description:
@@ -315,7 +417,7 @@ export const projects: Project[] = [
   /* ── Content Factory ────────────────────────────────────────────────── */
   {
     slug: "content-factory",
-    index: "03",
+    index: "04",
     title: "Content Factory",
     category: "AI Platform / Full-Stack",
     description:
@@ -400,7 +502,7 @@ export const projects: Project[] = [
   /* ── Home Café POS System ─────────────────────────────────────────────────── */
   {
     slug: "home-cafe-pos-system",
-    index: "04",
+    index: "05",
     title: "Home Café POS System",
     category: "Full-Stack / Integrations",
     description:
@@ -494,7 +596,7 @@ export const projects: Project[] = [
 
   {
     slug: "ai-data-assistant",
-    index: "05",
+    index: "06",
     title: "AI Data Assistant Chatbot",
     category: "AI Chatbot / Data / Backend",
     description:
@@ -574,7 +676,7 @@ export const projects: Project[] = [
   /* ── Training platform (internship, in progress) ─────────────────────── */
   {
     slug: "ai-assisted-training-platform",
-    index: "06",
+    index: "07",
     title: "AI-Assisted Training Platform",
     category: "Full-Stack / Team Project",
     description:
@@ -639,7 +741,7 @@ export const projects: Project[] = [
 
   {
     slug: "product-aggregation-platform",
-    index: "07",
+    index: "08",
     title: "Clothing Search & Product Aggregation",
     category: "Full-Stack / Data / Scraping",
     description:
@@ -717,7 +819,7 @@ export const projects: Project[] = [
 
   {
     slug: "telegram-life-assistant",
-    index: "08",
+    index: "09",
     title: "Telegram Life Assistant",
     category: "Automation / Integrations",
     description:
@@ -796,7 +898,7 @@ export const projects: Project[] = [
 
   {
     slug: "n8n-workflow-automations",
-    index: "09",
+    index: "10",
     title: "n8n Workflow Automations",
     category: "Workflow Automation",
     description:
@@ -937,7 +1039,7 @@ export const projects: Project[] = [
   },
   {
     slug: "ai-creative-design",
-    index: "10",
+    index: "11",
     title: "AI Creative Design & Visuals",
     category: "Generative AI / Creative Design",
     description:
